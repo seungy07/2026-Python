@@ -2,7 +2,7 @@
 # 범위 함수 : range()
 # 1. range(수) , 0 ~ 수 -1 까지 범위(정수)
 print( range(5)) # range(0, 5)
-print(list(range(5))) # 0 1 2 3 4
+print(list(range(5))) # [0 1 2 3 4]
 # 2. range( 시작값, 끝값  ) 
 print( list(range(3,6)))
 # 3. range(시작값, 끝값, 단계)
@@ -62,3 +62,12 @@ for i in range(1,11):
     if i == 3:
         continue
     print(i)
+
+x = 10
+y = 2
+
+if x > 4:
+    if y > 2:
+        print(x*y)
+else:
+    print(x+y)
