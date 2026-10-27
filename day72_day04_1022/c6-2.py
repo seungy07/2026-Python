@@ -39,3 +39,4 @@ s(a)
 
 output = [i for i in range(1,101) if "{:b}".format(i).count("0") == 1]
 print(output)
+
