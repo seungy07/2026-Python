@@ -45,8 +45,25 @@ print( f"이탈 위험 고객 수: {이탈위험고객ID.shape[0]} 명")
 # - 구매 금액(`sales`) 데이터를 0과 1 사이의 값으로 정규화(Min-Max Scaling) 하세요. * 공식 : ( x - 최솟값 ) / ( 최댓값 - 최솟값 )
 # - 정규화된 값이 0.9 이상(상위 10% 수준)인 고객을 'VVIP'로 정의하고, 해당 VVIP 고객들의 모든 정보(Row 전체)를 추출하여 출력하세요.
 # -- 추출된 VVIP 고객 데이터를 '구매 금액(4번 열)' 기준 내림차순(높은 금액 순)으로 정렬하여 상위 5명의 정보를 출력하세요.
-normalized_sales = (sales - np.min(sales) ) / (np.max(sales) - np.min(sales))
-vvip = data[ normalized_sales >= 0.9 ]
+정규화 = (sales - np.min(sales) ) / (np.max(sales) - np.min(sales))
+vvip = data[ 정규화 >= 0.9 ] # 원본에서 특정 조건 True 만 추출
 print(vvip)
-내림차순_vvip = vvip[np.argsort( vvip[:,4])[::-1]]
-print(f"상위 5명의 정보 { 내림차순_vvip[0:5] }")
+내림차순_vvip = vvip[np.argsort( vvip[:,4] )[::-1]] # np.argsort() 정렬된 순번(인덱스로) 반환
+print( f"상위 5명의 정보 \n{ 내림차순_vvip[0:5] }" )
+
+# 교수님 설명 부분
+x = np.array([[1,2,3],[4,5,6]])
+print( x + 3 ) 
+print( x[0]) # 0번째 행
+print(x[0,1]) # 2, 0행의 1열
+print( x[0, 1:]) # [2 3]
+print( x[:, 2]) # [3 6]
+y = x[0,1]
+y = 10
+print(x)
+y2 = x[:,2]
+y2[0] = 10
+print(x)
+# 슬라이싱한 결과가 배열이면서 특정 인덱스의 요소값 수정시 원본 같이 수정
+# 참조 때문
+
