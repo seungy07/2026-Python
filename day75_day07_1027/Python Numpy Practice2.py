@@ -40,6 +40,7 @@ print( f"방문당 평균 매출이 가장높은 고객 인덱스: {np.argmax(ar
 # - 이 조건에 해당하는 고객들의 전체 데이터(행)를 추출하고, 대상 고객이 총 몇 명인지 출력하세요.
 이탈위험고객ID = data[(data[:,1] <= 3) & (data[:,3] <= 1), :]
 print( f"이탈 위험 고객 수: {이탈위험고객ID.shape[0]} 명")
+# sum으로 True 수를 합계로 구하기도 가능
 
 # [Step 5] 고객 등급 정규화 및 VVIP 선정
 # - 구매 금액(`sales`) 데이터를 0과 1 사이의 값으로 정규화(Min-Max Scaling) 하세요. * 공식 : ( x - 최솟값 ) / ( 최댓값 - 최솟값 )
@@ -48,10 +49,10 @@ print( f"이탈 위험 고객 수: {이탈위험고객ID.shape[0]} 명")
 정규화 = (sales - np.min(sales) ) / (np.max(sales) - np.min(sales))
 vvip = data[ 정규화 >= 0.9 ] # 원본에서 특정 조건 True 만 추출
 print(vvip)
-내림차순_vvip = vvip[np.argsort( vvip[:,4] )[::-1]] # np.argsort() 정렬된 순번(인덱스로) 반환
+내림차순_vvip = vvip[np.argsort( vvip[:,4] )[::-1]] # np.argsort() 정렬된 순번(인덱스로) 반환, [ [1,2,3] ] 특정인덱스 자료의 정보 반환
 print( f"상위 5명의 정보 \n{ 내림차순_vvip[0:5] }" )
 
-# 교수님 설명 부분
+# 교수님 설명 부분, 슬라이싱 수정시 원본 바뀌는 것 주의**
 x = np.array([[1,2,3],[4,5,6]])
 print( x + 3 ) 
 print( x[0]) # 0번째 행
@@ -67,3 +68,5 @@ print(x)
 # 슬라이싱한 결과가 배열이면서 특정 인덱스의 요소값 수정시 원본 같이 수정
 # 참조 때문
 
+y = np.array([1,2,3,4,5,6])
+print( y[ [1,2] ] ) # [2 3]
