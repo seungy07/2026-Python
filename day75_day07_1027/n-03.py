@@ -3,7 +3,7 @@ import numpy as np
 # 1] 병합, vstack( [배열1,배열2] ), hstack([배열1,배열2])
 x = np.array([[1,2],[3,4]]) # 2차원 배열
 y = np.array([[5,6],[7,8]])
-z = np.vstack( [x,y] ) # .array 일때는 왜 한칸 떨어져서 나오는 거지? 
+z = np.vstack( [x,y] ) # .array 일때는 왜 한칸 떨어져서 나오는 거지? => 3차원
 print(z) # 세로
 
 z = np.hstack( [x,y] ) # 가로
@@ -41,7 +41,7 @@ print( y % 2 == 0 )
 # [[False  True False]
 #  [ True False  True]
 #  [False  True False]]
-print( y[ y % 2 == 0] ) # 이런식으로 전처리? 차원 축소도 전처리에 포함? 
+print( y[ y % 2 == 0] ) # 차원 축소, 유지는 선택 
 # [2 4 6 8]
 
 # 6] 삼항연산자, np.where( 조건, 참, 거짓 )
