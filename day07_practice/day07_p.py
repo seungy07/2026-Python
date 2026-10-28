@@ -168,3 +168,68 @@ ratio = len(complex_groups) / len(results) * 100
 print("복합 위험군 수:", len(complex_groups), "개")
 print("복합 위험군 비율:", round(ratio, 2), "%")
 print("복합 위험군:", complex_groups)
+
+# Step 1. 분석 결과
+max_avg = 0
+max_vehicle = ""
+
+for vehicle in vehicle_types:
+    avg = np.sum(accidents[vehicles == vehicle]) / 12
+
+    if avg > max_avg:
+        max_avg = avg
+        max_vehicle = vehicle
+
+max_count = 0
+max_group = ""
+
+for vehicle in vehicle_types:
+    for time in time_types:
+        count = np.sum(accidents[(vehicles == vehicle) & (times == time)])
+
+        if count > max_count:
+            max_count = count
+            max_group = vehicle + " / " + time
+
+print("평균 사고건수가 가장 높은 차량:", max_vehicle, round(max_avg, 2), "건")
+print("차량유형+시간대별 최대 사고 그룹:", max_group, max_count, "건")
+
+# Step 2. 특정 위험 그룹 필터링 (Boolean Indexing)
+
+deaths = data[:, 3].astype(int)
+serious = data[:, 4].astype(int)
+
+results = []
+
+for vehicle in vehicle_types:
+    for time in time_types:
+        condition = (vehicles == vehicle) & (times == time)
+
+        total_deaths = np.sum(deaths[condition])
+        total_serious = np.sum(serious[condition])
+
+        results.append([vehicle, time, total_deaths, total_serious])
+
+results = np.array(results, dtype=object)
+
+# 사망자 50명 이상 또는 중상자 1,000명 이상
+risk = (results[:, 2].astype(int) >= 50) | (results[:, 3].astype(int) >= 1000)
+risk_groups = results[risk]
+
+print("위험 그룹 수:", len(risk_groups), "개")
+print("위험 그룹:", risk_groups)
+
+# Step 4. 복합 위험군 분석
+
+# 사망자 50명 이상 AND 중상자 1,000명 이상
+complex_risk = (results[:, 2].astype(int) >= 50) & (results[:, 3].astype(int) >= 1000)
+
+# Boolean Indexing
+complex_groups = results[complex_risk]
+
+# 전체 그룹 대비 비율
+ratio = len(complex_groups) / len(results) * 100
+
+print("복합 위험군 수:", len(complex_groups), "개")
+print("복합 위험군 비율:", round(ratio, 2), "%")
+print("복합 위험군:", complex_groups)
