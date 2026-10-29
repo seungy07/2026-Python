@@ -99,10 +99,13 @@ axs[0].grid(True)
 # 2 번차트
 axs[1].bar( ['A', 'B', 'C'], [30,15,40], color='red' )
 
-plt.title('다중 그래프')
-# fig.suptitle("두 그래프의 전체 제목") 
-plt.tight_layout()  # 여백 자동 조정( 레이블 겹칩 방지 필수 옵션)
-plt.savefig('eda_summart.png', dpi=200) #  주의: plt.show() 호출 전에 savefig를 실행해야 백지 저장 방지
+fig.suptitle('메목') # 전체 제목 # fig.suptitle("두 그래프의 전체 제목") 
+# plt 활성화 된 기준
+# fig 변수가 가리키는 그림 기준 
+plt.title('다중 그래프') # 활성화된 차트 기준 제목
+
+# plt.tight_layout()  # 여백 자동 조정( 레이블 겹칩 방지 필수 옵션)
+# plt.savefig('eda_summart.png', dpi=200) #  주의: plt.show() 호출 전에 savefig를 실행해야 백지 저장 방지
 
 plt.show()
  
