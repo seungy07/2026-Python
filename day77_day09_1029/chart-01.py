@@ -62,9 +62,47 @@ plt.ylabel('시험 점수')
 plt.grid(True, linestyle=':', alpha=0.6)
 plt.show()
 
-# 4] 히스토그램 (연속형 수치/값 분포)
-heights = np.random.normal(loc=170, scale=5, size=1000) # loc=평균, scale=표준편차, size=샘플개수 , 종모양 분포
+# 4] 히스토그램 (연속형 수치/값 분포)  
+heights = np.random.normal(loc=170, scale=5, size=1000) # loc=평균, scale=표준편차, size=샘플개수 , 종모양 분포( 가우시안 분포 )
 plt.figure( figsize=(6,4) )
 
 # 4) 히스토그램 plt.hist( 연속된수치데이터, bins=구간개수, color=, edgecolor=테두리색, alpha= )
-plt.hist
+plt.hist( heights, bins=30, color='gray', edgecolor='black', alpha=0.7 )
+plt.title('종모양 히스토 그램')
+plt.xlabel('키 cm')
+plt.ylabel('빈도수')
+plt.grid(axis='y', linestyle=":")
+plt.show()
+
+# 5] 박스플롯 ( 분포 범위내 이상치 확인 )
+data_with_outliers = np.append(heights, [210, 215, 120]) # 정상 데이터 사이에 극단값(이상치: 250, 110) 삽입
+plt.figure( figsize=(6,4) )
+
+# 5) 박스플롯 plt.boxplot( 수치데이터, vert=세로True/가로방향False 출력 , patch_artist=상자내부 색상 채움True/False  )
+plt.boxplot( data_with_outliers, vert=True , patch_artist=True )
+plt.title('이상치 탐지 박스플롯')
+plt.ylabel('값')
+plt.grid(axis='y', linestyle=":", alpha=0.7)
+plt.show()
+
+# 6] 다중 그래프, 한번에 출력
+#   fig, axs = plt.subplots( 행개수, 열개수, figzise=(가로,세로) )
+fig, axs = plt.subplots( 1, 2 , figsize=(10,4) )  # fig 전체 axs는 개별 (공간 , 축)
+
+# 1번 서브 차트  개별로 넣을떄는  set_XXX
+axs[0].plot( [1,2,3],[10,20,30], color='green' )
+axs[0].set_title('섭 차트 1')
+axs[0].set_xlabel('x축')
+axs[0].set_ylabel('y축')
+axs[0].grid(True)
+
+# 2 번차트
+axs[1].bar( ['A', 'B', 'C'], [30,15,40], color='red' )
+
+plt.title('다중 그래프')
+# fig.suptitle("두 그래프의 전체 제목") 
+plt.tight_layout()  # 여백 자동 조정( 레이블 겹칩 방지 필수 옵션)
+plt.savefig('eda_summart.png', dpi=200) #  주의: plt.show() 호출 전에 savefig를 실행해야 백지 저장 방지
+
+plt.show()
+ 
