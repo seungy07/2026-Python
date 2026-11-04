@@ -53,4 +53,21 @@ plt.plot([0,100], model.predict([[0],[100]])) # 회귀선: 임의의 최솟값/�
 plt.show()
 # 11) 문제점
 # x,y 직선 관계이며 실 자료들은 꼭 비례 증가가 아닐 수 있다.
-# 해결: 다항 회귀
+# 해결: 다항 회귀로 확장
+
+# 12) 모델 평가, test용 자료 사용
+# -평균 제곱근 오차계산
+import numpy as np # sqrt(제곱근) numpy 함수 사용.
+from sklearn.metrics import mean_squared_error # 평균 오차(정답지와 예측자료) 라이브러리
+rmse = np.sqrt(mean_squared_error(y_test, y_pred)) # y_pred = model.predict(x_test)
+print(f"평균제곱오차: {rmse}g")
+# 모델이 실제 무게와 얼마나 틀렸는지 평균오차
+
+# -결정계수(R SCORE)설명력: 타깃 데이터의 전체 변동성 대비 모델이 얼마나 잘 설명하는지 0~1 사이 값, (1가까울수록 예측값 잘 설명하고 있다)
+from sklearn.metrics import r2_score # 결정계수 라이브러리  # 음수 값일시 문제있음 
+# R^2 = 1 - SSE/SST, SSE : 모델 없이 타깃의 평균값으로만 퉁쳐서 예측했을 떄의 오차(잔차) 제곱합 (평균선 기준)
+#                    SST : 학습시킨 회귀선으로 예측 했을 때 여전히 남아있는 오차(잔차) 제곱합 (학습시킨 모델 기준)
+r2 = r2_score(y_test, y_pred) # 결정계수 (정답지와 예측 자료)
+print(f"결정계수 : {r2}") # 결정계수 : 0.8199897860284712
+
+
