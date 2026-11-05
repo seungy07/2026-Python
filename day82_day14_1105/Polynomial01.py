@@ -100,6 +100,6 @@ zero_features = pd.sum( lasso.coef_ == 0)
 print(zero_features) # 기울기 0으로 제거된 특성 수
 # 훈령용이랑 테스트용 격차 확인
 
-# 다항에서는 스케일링(표준화) 필수
+# 다항에서는 스케일링(표준화) 필수 , StandardScaler() 
 # 특성이 적으면(과소적합/모델 단순) --> 항 추가(PolynomialFeatures) , degree 차수 
 # 특성이 많으면(과대적합/모델 복잡) --> 규제 Ridge(L2), Lasso(L1) , alpha 규제강도
