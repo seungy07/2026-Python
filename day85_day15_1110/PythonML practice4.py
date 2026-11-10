@@ -61,6 +61,7 @@ print("예측결과: ", logistic.predict(sample)) # [0. 1. 0.]
 print(logistic.classes_)
 print(logistic.predict_proba(sample))
 
+# 보기 편한 정수형 변환
 proba = logistic.predict_proba(x_test_scaled[:3])
 pred = logistic.predict(x_test_scaled[:3])
 
