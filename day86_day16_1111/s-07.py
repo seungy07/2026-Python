@@ -82,3 +82,5 @@ best_model = grid.best_estimator_
 pred = best_model.predict(x_test)
 
 print( classification_report(y_test,pred)) 
+
+# 추후 joblib로 최적 모델 저장 사용
