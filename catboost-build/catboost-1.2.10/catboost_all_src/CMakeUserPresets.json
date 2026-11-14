@@ -1,0 +1,9 @@
+{
+    "version": 4,
+    "vendor": {
+        "conan": {}
+    },
+    "include": [
+        "../build/temp.win-amd64-cpython-315/Release/conan/build/Release/generators/CMakePresets.json"
+    ]
+}

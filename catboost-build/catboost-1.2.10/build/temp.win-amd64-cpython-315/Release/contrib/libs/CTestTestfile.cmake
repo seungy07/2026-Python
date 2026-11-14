@@ -1,0 +1,37 @@
+# CMake generated Testfile for 
+# Source directory: C:/Users/ksyki/Desktop/2026 Python/catboost-build/catboost-1.2.10/catboost_all_src/contrib/libs
+# Build directory: C:/Users/ksyki/Desktop/2026 Python/catboost-build/catboost-1.2.10/build/temp.win-amd64-cpython-315/Release/contrib/libs
+# 
+# This file includes the relevant testing commands required for 
+# testing this directory and lists subdirectories to be tested as well.
+subdirs("cxxsupp")
+subdirs("zlib")
+subdirs("double-conversion")
+subdirs("libc_compat")
+subdirs("rapidjson")
+subdirs("re2")
+subdirs("tbb")
+subdirs("flatbuffers")
+subdirs("crcutil")
+subdirs("nayuki_md5")
+subdirs("base64")
+subdirs("fmath")
+subdirs("clapack")
+subdirs("libf2c")
+subdirs("cblas")
+subdirs("protobuf")
+subdirs("protoc")
+subdirs("tensorboard")
+subdirs("brotli")
+subdirs("libbz2")
+subdirs("fastlz")
+subdirs("lz4")
+subdirs("xxhash")
+subdirs("lzmasdk")
+subdirs("snappy")
+subdirs("zstd")
+subdirs("zstd06")
+subdirs("coreml")
+subdirs("onnx")
+subdirs("jdk")
+subdirs("pugixml")

@@ -1,0 +1,58 @@
+{
+    "version": 3,
+    "vendor": {
+        "conan": {}
+    },
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 15,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "conan-release",
+            "displayName": "'conan-release' config",
+            "description": "'conan-release' configure using 'Ninja' generator",
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_POLICY_DEFAULT_CMP0091": "NEW",
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_C_COMPILER": "cl",
+                "CMAKE_CXX_COMPILER": "cl"
+            },
+            "environment": {
+                "PATH": "C:\\Users\\ksyki\\.conan2\\p\\yasm0f3a271ce58b4\\p\\bin;C:\\Users\\ksyki\\.conan2\\p\\b\\swige12fb856b9b4b\\p\\bin;C:\\Users\\ksyki\\.conan2\\p\\ragel83efe87fd3acd\\p\\bin;$penv{PATH}",
+                "SWIG_LIB": "C:\\Users\\ksyki\\.conan2\\p\\b\\swige12fb856b9b4b\\p\\bin\\swiglib"
+            },
+            "toolset": {
+                "value": "v143",
+                "strategy": "external"
+            },
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            },
+            "toolchainFile": "generators\\conan_toolchain.cmake",
+            "binaryDir": "C:\\Users\\ksyki\\Desktop\\2026 Python\\catboost-build\\catboost-1.2.10\\build\\temp.win-amd64-cpython-315\\Release\\conan\\build\\Release"
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "conan-release",
+            "configurePreset": "conan-release",
+            "jobs": 8
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "conan-release",
+            "configurePreset": "conan-release",
+            "execution": {
+                "jobs": 8
+            },
+            "environment": {
+                "OPENSSL_MODULES": "C:\\Users\\ksyki\\.conan2\\p\\b\\opens45b9599602dab\\p\\lib\\ossl-modules"
+            }
+        }
+    ]
+}
