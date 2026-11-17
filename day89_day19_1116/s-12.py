@@ -96,6 +96,7 @@ print( final_model.feature_importances_ )
 import joblib
 joblib.dump( final_model , './day89_day19_1116/gbm_model.pkl') # 1) 
 model = joblib.load( './day89_day19_1116/gbm_model.pkl'  ) # 다른 .py 파일 또는 메소드 가정 
+
 # 8) 예측 
 new_cars = pd.DataFrame([
     {'year': 2019, 'mileage': 25000, 'brand': 'ford',   'model': 'f-150',  'title_status': 'clean vehicle',     'color': 'white', 'state': 'texas'},
