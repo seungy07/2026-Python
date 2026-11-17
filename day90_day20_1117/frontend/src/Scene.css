@@ -1,0 +1,841 @@
+/* =====================================================================
+   Scene.css : 배경 풍경 (하늘 · 해/달 · 구름 · 건물 · 도로 · 날씨 · 축제)
+   * 입력값에 따라 .scene 에 phase-xxx / weather-xxx 클래스가 붙고
+     그 클래스에 맞춰 색과 효과가 바뀐다.
+   ===================================================================== */
+
+/* ---------- 0. 장면 루트 + 하루 단계별 색상 변수 ---------- */
+.scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: #0b1530;
+
+  /* 낮 (기본값) */
+  --cloud-top: #ffffff;
+  --cloud-bottom: #d9e4f2;
+  --storm-top: #8f98a8;
+  --storm-bottom: #4d5668;
+  --bld-far: #a8c1dd;
+  --bld-near: #6a7e9e;
+  --win: rgba(226, 238, 255, 0.55);
+  --win-lit: rgba(226, 238, 255, 0.55);
+  --house: #f1e4d2;
+  --roof: #c75a40;
+  --door: #7a4a32;
+  --tree: #4c8a59;
+  --tree-far: #8fb99b;
+  --trunk: #6b4a35;
+  --hill: #a6cba0;
+  --road: #474e5e;
+  --sidewalk: #aab2c0;
+  --lane: rgba(250, 246, 232, 0.9);
+  --lamp-pole: #5d6678;
+  --lamp-head: #d9dee7;
+}
+
+.scene.phase-dawn {
+  --cloud-top: #fbe4ec;
+  --cloud-bottom: #b6a3cc;
+  --storm-top: #7d7a92;
+  --storm-bottom: #3f3c55;
+  --bld-far: #8b84b3;
+  --bld-near: #4d4878;
+  --win: rgba(255, 214, 200, 0.18);
+  --win-lit: #ffd08a;
+  --house: #b7a1c7;
+  --roof: #7b4d78;
+  --door: #463252;
+  --tree: #4a5d78;
+  --tree-far: #7a7ea6;
+  --trunk: #3d3450;
+  --hill: #8888b0;
+  --road: #3a3a52;
+  --sidewalk: #7f7d98;
+  --lane: rgba(255, 236, 220, 0.7);
+  --lamp-pole: #4a4862;
+  --lamp-head: #ffe2a8;
+}
+
+.scene.phase-sunset {
+  --cloud-top: #ffe0c4;
+  --cloud-bottom: #e59a9b;
+  --storm-top: #7f6c7c;
+  --storm-bottom: #3e3242;
+  --bld-far: #bd7c92;
+  --bld-near: #5a3c62;
+  --win: rgba(255, 200, 160, 0.15);
+  --win-lit: #ffc46b;
+  --house: #d39b90;
+  --roof: #8a3f50;
+  --door: #4a2a3b;
+  --tree: #684a5d;
+  --tree-far: #a6768b;
+  --trunk: #3f2a36;
+  --hill: #b27d8d;
+  --road: #3d3443;
+  --sidewalk: #8c7a88;
+  --lane: rgba(255, 230, 200, 0.75);
+  --lamp-pole: #4c3d4f;
+  --lamp-head: #ffe1a1;
+}
+
+.scene.phase-night {
+  --cloud-top: #56637f;
+  --cloud-bottom: #283250;
+  --storm-top: #353c50;
+  --storm-bottom: #171b29;
+  --bld-far: #1a2446;
+  --bld-near: #0d142e;
+  --win: rgba(120, 140, 200, 0.08);
+  --win-lit: #ffd56e;
+  --house: #18213d;
+  --roof: #111830;
+  --door: #0a1022;
+  --tree: #0e1c29;
+  --tree-far: #15223c;
+  --trunk: #0a111e;
+  --hill: #131e38;
+  --road: #1a1f2c;
+  --sidewalk: #2b3243;
+  --lane: rgba(230, 230, 210, 0.45);
+  --lamp-pole: #2a3042;
+  --lamp-head: #ffe7a3;
+}
+
+/* 장면 안의 모든 레이어는 겹쳐서 배치 (나중에 그린 것이 위) */
+.scene > * {
+  position: absolute;
+}
+
+@keyframes scene-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ---------- 1. 하늘 (하루 단계별 4장을 겹쳐 두고 투명도로 전환) ---------- */
+.sky {
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.6s ease;
+  will-change: opacity; /* 전환을 그래픽카드(GPU)에서 처리 → 다시 그리지 않음 */
+}
+.sky.on { opacity: 1; }
+
+.sky-dawn {
+  background: linear-gradient(180deg, #23285a 0%, #5d4b8c 34%, #c27aa0 60%, #f6b48f 80%, #ffd9a8 100%);
+}
+.sky-day {
+  background: linear-gradient(180deg, #2f80d8 0%, #58a6ec 38%, #9ed2f7 70%, #dcf1ff 100%);
+}
+.sky-sunset {
+  background: linear-gradient(180deg, #1f2a5c 0%, #5b3f7f 28%, #c4567a 56%, #f58a5c 78%, #ffc278 100%);
+}
+.sky-night {
+  background: linear-gradient(180deg, #030716 0%, #0a1433 40%, #142454 74%, #1f3266 100%);
+}
+
+/* 날씨에 따라 하늘 위에 덧씌우는 색 */
+.sky-tint {
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+  will-change: opacity;
+}
+.sky-tint.on { opacity: 1; }
+.tint-Cloudy { background: linear-gradient(180deg, rgba(110, 122, 140, 0.55), rgba(160, 170, 185, 0.35)); }
+.tint-Fog { background: linear-gradient(180deg, rgba(200, 206, 214, 0.6), rgba(232, 235, 240, 0.72)); }
+.tint-Stormy { background: linear-gradient(180deg, rgba(20, 24, 36, 0.84), rgba(52, 60, 78, 0.72)); }
+.tint-Sandstorms { background: linear-gradient(180deg, rgba(150, 98, 45, 0.72), rgba(222, 170, 98, 0.66)); }
+.phase-night .tint-Cloudy { background: linear-gradient(180deg, rgba(20, 24, 36, 0.45), rgba(40, 46, 62, 0.35)); }
+.phase-night .tint-Fog { background: linear-gradient(180deg, rgba(60, 68, 88, 0.5), rgba(110, 118, 138, 0.45)); }
+.phase-night .tint-Sandstorms { background: linear-gradient(180deg, rgba(70, 48, 26, 0.72), rgba(120, 86, 48, 0.62)); }
+
+/* ---------- 2. 별 + 별똥별 ---------- */
+.stars {
+  inset: 0;
+  transition: opacity 1.6s ease;
+  will-change: opacity;
+}
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.85);
+  animation: twinkle 3s ease-in-out infinite alternate;
+}
+@keyframes twinkle {
+  from { opacity: 0.25; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1.15); }
+}
+.shooting-star {
+  position: absolute;
+  top: 10%;
+  left: 72%;
+  width: 150px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0));
+  opacity: 0;
+  animation: shooting 9s ease-in 3s infinite;
+}
+@keyframes shooting {
+  0% { opacity: 0; transform: translate(0, 0) rotate(-24deg) scaleX(0.3); }
+  2% { opacity: 1; }
+  9% { opacity: 0; transform: translate(-440px, 196px) rotate(-24deg) scaleX(1); }
+  100% { opacity: 0; transform: translate(-440px, 196px) rotate(-24deg) scaleX(1); }
+}
+
+/* ---------- 3. 해 / 달 (주문 시각에 따라 포물선으로 이동) ---------- */
+/* 위치는 transform 으로 이동 : left/top 을 바꾸면 큰 빛 번짐을 매 프레임 다시 그려서 느려짐 */
+.sun {
+  left: 0;
+  top: 0;
+  width: 120px;
+  height: 120px;
+  margin: -60px 0 0 -60px;
+  transition: transform 1.4s ease, opacity 1.2s ease;
+  will-change: transform, opacity;
+}
+.sun-core {
+  position: absolute;
+  inset: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 38%, #fffbe6 0%, #ffe48a 45%, #ffbe3b 100%);
+  box-shadow: 0 0 40px 14px rgba(255, 214, 102, 0.55), 0 0 130px 56px rgba(255, 200, 90, 0.25);
+}
+.phase-dawn .sun-core,
+.phase-sunset .sun-core {
+  background: radial-gradient(circle at 40% 38%, #fff0d6 0%, #ffad66 50%, #ff6a3d 100%);
+  box-shadow: 0 0 50px 18px rgba(255, 140, 80, 0.55), 0 0 170px 76px rgba(255, 120, 80, 0.3);
+}
+.sun-rays {
+  position: absolute;
+  inset: -70px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(rgba(255, 236, 170, 0.34) 0deg 6deg, rgba(255, 236, 170, 0) 6deg 18deg);
+  -webkit-mask: radial-gradient(circle, #000 22%, transparent 68%);
+  mask: radial-gradient(circle, #000 22%, transparent 68%);
+  animation: scene-spin 70s linear infinite;
+}
+@keyframes scene-spin {
+  to { transform: rotate(360deg); }
+}
+
+.moon {
+  left: 0;
+  top: 0;
+  width: 72px;
+  height: 72px;
+  margin: -36px 0 0 -36px;
+  transition: transform 1.4s ease, opacity 1.2s ease;
+  will-change: transform, opacity;
+}
+.moon-core {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 62% 58%, rgba(170, 160, 120, 0.45) 0 9%, transparent 10%),
+    radial-gradient(circle at 38% 70%, rgba(170, 160, 120, 0.35) 0 6%, transparent 7%),
+    radial-gradient(circle at 68% 30%, rgba(170, 160, 120, 0.3) 0 5%, transparent 6%),
+    radial-gradient(circle at 36% 36%, #fffef4, #f3ebc8 60%, #d8cda0 100%);
+  box-shadow: 0 0 30px 8px rgba(255, 246, 210, 0.38), 0 0 100px 34px rgba(200, 210, 255, 0.16);
+}
+
+/* ---------- 4. 구름 ---------- */
+.clouds {
+  inset: 0;
+  animation: scene-fade-in 1.2s ease both;
+}
+.cloud {
+  position: absolute;
+  left: 0;
+  animation-name: cloud-drift;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  filter: drop-shadow(0 12px 16px rgba(20, 30, 60, 0.12));
+}
+.cloud svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+@keyframes cloud-drift {
+  from { transform: translateX(-35vw); }
+  to { transform: translateX(120vw); }
+}
+
+/* ---------- 5. 불꽃놀이 (축제 + 노을/밤) ---------- */
+.fireworks {
+  inset: 0;
+  animation: scene-fade-in 1s ease both;
+}
+.firework {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+.firework i {
+  position: absolute;
+  display: block;
+}
+.firework .rocket {
+  left: -1.5px;
+  top: 0;
+  width: 3px;
+  height: 16px;
+  border-radius: 2px;
+  background: linear-gradient(to top, rgba(255, 255, 255, 0), var(--c));
+  opacity: 0;
+  animation: fw-rocket 3.6s ease-out infinite;
+  animation-delay: var(--delay);
+}
+@keyframes fw-rocket {
+  0% { transform: translateY(34vh); opacity: 0; }
+  3% { opacity: 1; }
+  27% { transform: translateY(0); opacity: 1; }
+  29%, 100% { transform: translateY(0); opacity: 0; }
+}
+.firework .flash {
+  left: -45px;
+  top: -45px;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--c), rgba(255, 255, 255, 0) 65%);
+  opacity: 0;
+  animation: fw-flash 3.6s ease-out infinite;
+  animation-delay: var(--delay);
+}
+@keyframes fw-flash {
+  0%, 28% { opacity: 0; transform: scale(0.3); }
+  31% { opacity: 0.55; transform: scale(1); }
+  55%, 100% { opacity: 0; transform: scale(1.7); }
+}
+.firework .spark {
+  left: 0;
+  top: -1.5px;
+  width: 30px;
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), var(--c) 70%, #fff);
+  box-shadow: 0 0 6px var(--c);
+  transform-origin: 0 50%;
+  opacity: 0;
+  animation: fw-spark 3.6s cubic-bezier(0.15, 0.7, 0.3, 1) infinite;
+  animation-delay: var(--delay);
+}
+@keyframes fw-spark {
+  0%, 28% { transform: rotate(var(--a)) translateX(0) scaleX(0.2); opacity: 0; }
+  30% { opacity: 1; }
+  75% { opacity: 0.85; }
+  100% { transform: rotate(var(--a)) translateX(var(--d)) scaleX(1); opacity: 0; }
+}
+
+/* ---------- 6. 건물 / 집 / 나무 (도시 유형) ---------- */
+.skyline {
+  left: 0;
+  right: 0;
+  bottom: 84px;
+  height: 42vh;
+  animation: scene-fade-in 1s ease both;
+}
+.skyline svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* 건물 · 창문 · 집 · 나무는 색 전환 효과 없이 바로 바뀜
+   (도형이 수백~천여 개라 하나하나 색을 서서히 바꾸면 시간대 전환 순간 렉이 걸림) */
+.bld.far { fill: var(--bld-far); }
+.bld.near { fill: var(--bld-near); }
+.win { fill: var(--win); }
+.win.lit { fill: var(--win-lit); }
+.winfar { fill: var(--win-lit); opacity: 0; }
+.phase-night .winfar { opacity: 0.75; }
+.phase-dawn .winfar,
+.phase-sunset .winfar { opacity: 0.35; }
+.house { fill: var(--house); }
+.roof,
+.chimney { fill: var(--roof); }
+.door { fill: var(--door); }
+.tree { fill: var(--tree); }
+.tree.far { fill: var(--tree-far); }
+.trunk { fill: var(--trunk); }
+.hill { fill: var(--hill); }
+.antenna {
+  stroke: var(--bld-near);
+  stroke-width: 3;
+}
+.beacon {
+  fill: #ff4d4d;
+  opacity: 0;
+}
+.phase-night .beacon,
+.phase-sunset .beacon {
+  animation: beacon 1.4s ease-in-out infinite;
+}
+@keyframes beacon {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 1; }
+}
+
+/* ---------- 7. 도로 · 가로등 · 자동차 · 배달 오토바이 ---------- */
+.road-wrap {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 180px;
+}
+.road {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 86px;
+  background: var(--road);
+  transition: background 1.6s ease;
+}
+.sidewalk {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 12px;
+  background: var(--sidewalk);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.18);
+  transition: background 1.6s ease;
+}
+.lane-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 47px;
+  height: 3px;
+  background: repeating-linear-gradient(90deg, var(--lane) 0 34px, transparent 34px 66px);
+}
+
+/* 가로등 : 밤에는 불빛과 빛줄기 */
+.lamps {
+  position: absolute;
+  inset: 0;
+}
+.lamp {
+  position: absolute;
+  bottom: 74px;
+  width: 4px;
+  height: 70px;
+}
+.lamp-pole {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 4px;
+  height: 70px;
+  border-radius: 2px;
+  background: var(--lamp-pole);
+  transition: background 1.6s ease;
+}
+.lamp-head {
+  position: absolute;
+  left: -10px;
+  top: -4px;
+  width: 24px;
+  height: 8px;
+  border-radius: 6px 6px 3px 3px;
+  background: var(--lamp-head);
+  transition: background 1.6s ease, box-shadow 1.6s ease;
+}
+.lamp-cone {
+  position: absolute;
+  left: -38px;
+  top: 4px;
+  width: 80px;
+  height: 140px;
+  background: linear-gradient(180deg, rgba(255, 222, 140, 0.42), rgba(255, 222, 140, 0));
+  clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%);
+  opacity: 0;
+  transition: opacity 1.6s ease;
+}
+.phase-night .lamp-head { box-shadow: 0 0 18px 6px rgba(255, 214, 120, 0.75); }
+.phase-night .lamp-cone { opacity: 1; }
+.phase-dawn .lamp-cone,
+.phase-sunset .lamp-cone { opacity: 0.45; }
+.phase-dawn .lamp-head,
+.phase-sunset .lamp-head { box-shadow: 0 0 12px 3px rgba(255, 214, 120, 0.5); }
+
+/* 자동차 : 교통 혼잡도에 따라 개수와 속도가 달라짐 */
+.cars {
+  position: absolute;
+  inset: 0;
+  animation: scene-fade-in 1s ease both;
+}
+.car {
+  position: absolute;
+  left: 0;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.car.lane-far {
+  bottom: 46px;
+  animation-name: drive-left;
+}
+.car.lane-near {
+  bottom: 9px;
+  animation-name: drive-right;
+}
+.car-body { position: relative; }
+.lane-far .car-body { transform: scaleX(-1) scale(0.88); }
+.car svg { display: block; }
+@keyframes drive-right {
+  from { transform: translateX(-12vw); }
+  to { transform: translateX(112vw); }
+}
+@keyframes drive-left {
+  from { transform: translateX(112vw); }
+  to { transform: translateX(-12vw); }
+}
+.headlight-beam {
+  position: absolute;
+  left: 72px;
+  top: 8px;
+  width: 96px;
+  height: 20px;
+  background: linear-gradient(90deg, rgba(255, 236, 170, 0.55), rgba(255, 236, 170, 0));
+  clip-path: polygon(0 35%, 100% 0, 100% 100%, 0 65%);
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.phase-night .headlight-beam { opacity: 1; }
+.weather-Stormy .headlight-beam,
+.weather-Fog .headlight-beam,
+.weather-Sandstorms .headlight-beam { opacity: 0.8; }
+.taillight.brake { filter: drop-shadow(0 0 4px #ff3b3b); }
+
+/* 배달 오토바이 : 예측 중에는 달리고, 결과가 오면 고객 앞에 도착 */
+.scooter {
+  position: absolute;
+  left: 0;
+  bottom: 2px;
+  width: 124px;
+  opacity: 0;
+  transform: translateX(-20vw);
+  transition: opacity 0.4s ease;
+}
+.scooter svg {
+  display: block;
+  position: relative;
+}
+.scooter.riding {
+  opacity: 1;
+  animation: scooter-ride 4.2s linear infinite;
+}
+.scooter.arrived {
+  opacity: 1;
+  animation: scooter-arrive 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+.scooter.riding svg { animation: scooter-bump 0.32s ease-in-out infinite alternate; }
+.scooter.arrived svg { animation: scooter-bump 0.32s ease-in-out 6 alternate; }
+@keyframes scooter-ride {
+  from { transform: translateX(-15vw); }
+  to { transform: translateX(110vw); }
+}
+@keyframes scooter-arrive {
+  from { transform: translateX(-15vw); }
+  to { transform: translateX(calc(80vw - 132px)); }
+}
+@keyframes scooter-bump {
+  from { transform: translateY(0); }
+  to { transform: translateY(-2px); }
+}
+.phase-night .scooter-light,
+.weather-Stormy .scooter-light { filter: drop-shadow(0 0 6px #ffe8a3); }
+
+.puff {
+  position: absolute;
+  left: 2px;
+  bottom: 14px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(225, 230, 240, 0.75);
+  animation: puff 0.9s ease-out infinite;
+}
+.puff.p2 { animation-delay: 0.3s; }
+.puff.p3 { animation-delay: 0.6s; }
+@keyframes puff {
+  from { transform: translate(0, 0) scale(0.4); opacity: 0.85; }
+  to { transform: translate(-36px, -10px) scale(1.7); opacity: 0; }
+}
+
+.arrive-bubble {
+  position: absolute;
+  left: 64px;
+  top: -30px;
+  padding: 5px 12px;
+  border-radius: 12px;
+  background: #fff;
+  color: #14213d;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 8px 18px -6px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transform: translateY(6px);
+  animation: bubble-in 0.4s ease 1.7s forwards;
+}
+.arrive-bubble::after {
+  content: '';
+  position: absolute;
+  left: 18px;
+  bottom: -6px;
+  border: 6px solid transparent;
+  border-bottom: none;
+  border-top-color: #fff;
+}
+@keyframes bubble-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 도착지 핀 */
+.dest-pin {
+  position: absolute;
+  left: 80vw;
+  bottom: 62px;
+  font-size: 30px;
+  line-height: 1;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35));
+  animation: pin-bounce 1.2s ease-in-out infinite;
+}
+.dest-pin span {
+  position: absolute;
+  left: 50%;
+  top: -20px;
+  transform: translateX(-50%);
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #14213d;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+@keyframes pin-bounce {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -6px); }
+}
+
+/* ---------- 8. 날씨 효과 ---------- */
+/* 폭풍 : 비 + 번개 */
+.rain {
+  inset: -10%;
+  transform: rotate(12deg);
+  animation: scene-fade-in 1s ease both;
+}
+.rain i {
+  position: absolute;
+  top: 0;
+  width: 1.6px;
+  background: linear-gradient(180deg, rgba(200, 220, 255, 0), rgba(210, 228, 255, 0.9));
+  animation: rain-fall 0.6s linear infinite;
+}
+@keyframes rain-fall {
+  from { transform: translateY(-20vh); }
+  to { transform: translateY(125vh); }
+}
+.lightning-flash {
+  inset: 0;
+  background: rgba(235, 240, 255, 0.9);
+  opacity: 0;
+  animation: lightning 7s infinite;
+}
+.lightning-bolt {
+  top: 4%;
+  left: 63%;
+  width: 70px;
+  height: 260px;
+  opacity: 0;
+  filter: drop-shadow(0 0 12px rgba(220, 230, 255, 0.95));
+  animation: lightning 7s infinite;
+}
+.lightning-bolt path { fill: #f5f8ff; }
+@keyframes lightning {
+  0%, 86%, 100% { opacity: 0; }
+  87% { opacity: 0.75; }
+  88% { opacity: 0.1; }
+  89.5% { opacity: 0.55; }
+  92% { opacity: 0; }
+}
+
+/* 안개 */
+.fog {
+  inset: 0;
+  animation: scene-fade-in 1.4s ease both;
+}
+.fog-band {
+  position: absolute;
+  left: -30%;
+  width: 160%;
+  height: 32vh;
+  background: radial-gradient(ellipse at center, rgba(240, 243, 247, 0.78) 0%, rgba(240, 243, 247, 0) 68%);
+  filter: blur(8px);
+  animation: haze-move 28s ease-in-out infinite alternate;
+}
+.band-0 { bottom: 2%; }
+.band-1 { bottom: 16%; animation-duration: 36s; animation-delay: -10s; }
+.band-2 { bottom: 30%; animation-duration: 44s; opacity: 0.7; }
+.band-3 { bottom: 46%; animation-duration: 52s; animation-delay: -20s; opacity: 0.5; }
+.phase-night .fog-band {
+  background: radial-gradient(ellipse at center, rgba(150, 160, 185, 0.55) 0%, rgba(150, 160, 185, 0) 68%);
+}
+@keyframes haze-move {
+  from { transform: translateX(-8%); }
+  to { transform: translateX(8%); }
+}
+
+/* 바람 : 바람 줄기 + 날아가는 나뭇잎 */
+.wind {
+  inset: 0;
+  animation: scene-fade-in 1s ease both;
+}
+.streak {
+  position: absolute;
+  left: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
+  animation: streak 2s ease-in-out infinite;
+}
+@keyframes streak {
+  0% { transform: translateX(-30vw); opacity: 0; }
+  15% { opacity: 0.9; }
+  85% { opacity: 0.9; }
+  100% { transform: translateX(120vw); opacity: 0; }
+}
+.leaf {
+  position: absolute;
+  left: 0;
+  line-height: 1;
+  animation: leaf-fly 6s linear infinite;
+}
+@keyframes leaf-fly {
+  0% { transform: translate(-10vw, 0) rotate(0deg); }
+  25% { transform: translate(20vw, -4vh) rotate(160deg); }
+  50% { transform: translate(50vw, 3vh) rotate(320deg); }
+  75% { transform: translate(80vw, -3vh) rotate(480deg); }
+  100% { transform: translate(112vw, 2vh) rotate(640deg); }
+}
+
+/* 모래폭풍 : 모래 입자 + 누런 먼지층 */
+.sand {
+  inset: 0;
+  animation: scene-fade-in 1s ease both;
+}
+.grain {
+  position: absolute;
+  left: 0;
+  border-radius: 50%;
+  animation: sand-blow 2s linear infinite;
+}
+@keyframes sand-blow {
+  from { transform: translate(-6vw, 0); }
+  to { transform: translate(110vw, -8vh); }
+}
+.sand-haze {
+  position: absolute;
+  left: -30%;
+  width: 160%;
+  height: 45vh;
+  background: radial-gradient(ellipse at center, rgba(222, 176, 110, 0.55), rgba(222, 176, 110, 0) 70%);
+  filter: blur(10px);
+  animation: haze-move 14s ease-in-out infinite alternate;
+}
+.sand-haze.h1 { bottom: 0; }
+.sand-haze.h2 { bottom: 30%; animation-duration: 20s; animation-delay: -6s; opacity: 0.8; }
+
+/* 건물까지 뿌옇게 덮는 대기층 (안개 · 모래폭풍 · 폭풍) */
+.atmo {
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+  will-change: opacity;
+}
+.atmo.on { opacity: 1; }
+.atmo-Fog { background: linear-gradient(0deg, rgba(232, 236, 241, 0.62) 0%, rgba(232, 236, 241, 0.26) 55%, rgba(232, 236, 241, 0.05) 100%); }
+.atmo-Sandstorms { background: linear-gradient(0deg, rgba(190, 136, 70, 0.5), rgba(214, 168, 104, 0.22) 60%, rgba(214, 168, 104, 0.08)); }
+.atmo-Stormy { background: linear-gradient(0deg, rgba(10, 14, 26, 0.36), rgba(10, 14, 26, 0.18)); }
+.phase-night .atmo-Fog { background: linear-gradient(0deg, rgba(110, 120, 145, 0.45), rgba(110, 120, 145, 0.15) 60%, rgba(110, 120, 145, 0)); }
+
+/* ---------- 9. 축제 : 전구 가랜드 · 깃발 · 색종이 ---------- */
+.festival-decor {
+  inset: 0;
+  animation: scene-fade-in 0.8s ease both;
+}
+.confetti {
+  position: absolute;
+  inset: 0;
+}
+.confetti i {
+  position: absolute;
+  top: 0;
+  opacity: 0.92;
+  animation: confetti-fall var(--dur) linear infinite;
+  animation-delay: var(--delay);
+}
+@keyframes confetti-fall {
+  0% { transform: translate3d(0, -12vh, 0) rotateZ(0deg) rotateY(0deg); }
+  100% { transform: translate3d(var(--sway), 112vh, 0) rotateZ(var(--spin)) rotateY(900deg); }
+}
+.garland {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 110px;
+}
+.garland-string {
+  fill: none;
+  stroke: rgba(60, 50, 40, 0.55);
+  stroke-width: 2;
+}
+.phase-night .garland-string,
+.weather-Stormy .garland-string { stroke: rgba(235, 225, 205, 0.4); }
+.flag {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: flag-swing 2.6s ease-in-out infinite alternate;
+}
+@keyframes flag-swing {
+  from { transform: rotate(-7deg); }
+  to { transform: rotate(7deg); }
+}
+.bulb {
+  animation: bulb-blink 1.6s ease-in-out infinite alternate;
+}
+@keyframes bulb-blink {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
+}
+
+/* ---------- 10. 움직임 줄이기 설정을 켠 사용자 배려 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .scene *,
+  .scene *::before,
+  .scene *::after {
+    animation-play-state: paused !important;
+  }
+  .rain,
+  .wind,
+  .sand,
+  .confetti,
+  .fireworks,
+  .shooting-star,
+  .lightning-flash,
+  .lightning-bolt {
+    display: none;
+  }
+}
