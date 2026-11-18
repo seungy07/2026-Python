@@ -69,33 +69,44 @@ def objecctive(trial):
 study = optuna.create_study(direction='maximize', sampler= optuna.samplers.TPESampler(seed=42) )
 
 # 2. study.optimize()를 실행하여 목표 성능(R2 85% 이상)에 도달할 수 있도록 적절한 시도 횟수(n_trials)만큼 튜닝을 수행하세요.
-def stop_at_target(study, trial):
-    if study.best_value >= 0.85:
-        print(f'목표 달성까지 탐색 횟수: {trial.number + 1}회')
-        print(f'최고 교차검증 평균 R²: {study.best_value:.4f}')
-        study.stop()
+study.optimize(objecctive, n_trials=10)
 
-study.optimize(objecctive, n_trials=100, callbacks=[stop_at_target])
 # 목표 달성 여부와 관계없이 최종 결과 출력
-print('총 탐색 횟수:', len(study.trials))
-print('최고 점수가 나온 탐색:', study.best_trial.number + 1, '번째')
-print('최고 교차검증 평균 R²:', study.best_value)
+print('최고 교차검증 평균 R²:', study.best_value) # 최고 교차검증 평균 R²: 0.859096908159119
 
 # 3. 도출된 최적 하이퍼파라미터(study.best_params)와 사용자 속성에서 추출한 자동 산출 최적 트리 개수(study.best_trial.user_attrs['best_n_estimators'])를 출력하세요.
-print( '최적 하이퍼파라미터: ', study.best_params )
+print( '최적 하이퍼파라미터: ', study.best_params ) #최적 하이퍼파라미터:  {'learning_rate': 0.08029218200897703, 'num_leaves': 10, 'max_depth': 3, 'min_child_samples': 30, 'subsample': 0.9109447544977591, 'colsample_bytree': 0.9901774165289148}
 optimal_model = study.best_trial.user_attrs['best_n_estimators']
-print('최적 트리 수: ', optimal_model)
+print('최적 트리 수: ', optimal_model) # 최적 트리 수:  51
 
 # [단계 5] 최종 모델 학습 및 회귀 성능·특성 중요도 평가
 # 1. 도출된 최적 파라미터(study.best_params)와 n_estimators=optimal_n_estimators를 적용한 최종 LGBMRegressor를 생성하고 전체 X_train, Y_train으로 학습(fit)시키세요.
-# 2. Train R2 점수와 Test R2 점수를 각각 산출하여 출력하고, Test R2 점수가 0.85 이상인지 확인하세요.
-# 3. 최종 모델이 학습한 특성 이름(feature_names_in_)과 특성 중요도(feature_importances_)를 출력하여 주요 영향 변수를 확인하세요.
+final_model = LGBMRegressor(random_state=42, verbose=-1, n_jobs=-1,
+                            **study.best_params, n_estimators=optimal_model)
+final_model.fit(X_train,Y_train)
 
+# 2. Train R2 점수와 Test R2 점수를 각각 산출하여 출력하고, Test R2 점수가 0.85 이상인지 확인하세요.
+print('Train r2: ', final_model.score(X_train,Y_train)) # Train r2:  0.8731899607717326
+print('Test r2: ', final_model.score(X_test,Y_test)) # Test r2:  0.881962508898816
+
+# 3. 최종 모델이 학습한 특성 이름(feature_names_in_)과 특성 중요도(feature_importances_)를 출력하여 주요 영향 변수를 확인하세요.
+print( final_model.feature_name_ ) # ['age', 'bmi', 'children', 'sex', 'smoker', 'region']
+print(final_model.feature_importances_) # [141  88  37   9  47  15]
 
 # [단계 6] 모델 직렬화(저장/불러오기) 및 신규 고객 데이터 실시간 추론
 # 1. joblib.dump를 사용하여 최적화된 최종 모델을 './lgbm_insurance_model.pkl'로 저장하고, joblib.load로 다시 불러오세요.
+import joblib
+joblib.dump(final_model, './day89_day19_1116/lgbm_insurance_model.pkl')
+model = joblib.load('./day89_day19_1116/lgbm_insurance_model.pkl')
+
 # 2. 신규 고객 2명의 원본 데이터(DataFrame)를 생성하세요:
-#  - 1번 고객: {'age': 28, 'bmi': 23.5, 'children': 0, 'sex': 'female', 'smoker': 'no', 'region': 'southwest'}
-#  - 2번 고객: {'age': 52, 'bmi': 34.2, 'children': 2, 'sex': 'male', 'smoker': 'yes', 'region': 'southeast'}
+sample = pd.DataFrame([{'age': 28, 'bmi': 23.5, 'children': 0, 'sex': 'female', 'smoker': 'no', 'region': 'southwest'},{'age': 52, 'bmi': 34.2, 'children': 2, 'sex': 'male', 'smoker': 'yes', 'region': 'southeast'}])
+
 # 3. 범주형 카테고리 매핑 일치를 위해 신규 데이터의 cat_cols 컬럼 타입을 X_train[col].dtype과 동일하게 변환하세요.
+for col in cat_cols:
+    sample[col] = sample[col].astype('category')
+
 # 4. 불러온 모델의 predict()에 전달하여 1번 고객과 2번 고객의 예측 연간 의료비를 출력하세요.
+pred = model.predict(sample)
+print( pred[0] ) # 4500.920403241691
+print( pred[1] ) # 
