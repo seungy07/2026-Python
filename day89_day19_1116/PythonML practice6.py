@@ -109,4 +109,4 @@ for col in cat_cols:
 # 4. 불러온 모델의 predict()에 전달하여 1번 고객과 2번 고객의 예측 연간 의료비를 출력하세요.
 pred = model.predict(sample)
 print( pred[0] ) # 4500.920403241691
-print( pred[1] ) # 
+print( pred[1] ) # 44937.38887044564
